@@ -11,7 +11,7 @@ public class Main {
                 new CircuitBreaker(
                         new CircuitBreakerConfig(
                                 3,
-                                Duration.ofSeconds(10)
+                                Duration.ofSeconds(5)
                         )
                 );
 
@@ -34,20 +34,20 @@ public class Main {
 
                 System.out.printf("[%d] SUCCESS | State=%s | Response=%s%n",
                         i,
-                        breaker.state.toString(),
+                        breaker.stateManagement.name(),
                         response);
 
             } catch (CircuitBreakerOpenException ex) {
 
                 System.out.printf("[%d] BLOCKED | State=%s%n",
                         i,
-                        breaker.state.toString());
+                        breaker.stateManagement.name());
 
             } catch (Exception ex) {
 
                 System.out.printf("[%d] FAILURE | State=%s | %s%n",
                         i,
-                        breaker.state.toString(),
+                        breaker.stateManagement.name(),
                         ex.getMessage());
 
             }
