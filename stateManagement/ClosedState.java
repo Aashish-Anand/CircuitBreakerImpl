@@ -10,7 +10,7 @@ public class ClosedState implements StateInterface {
     public State name() {
         return State.CLOSED;
     }
-    
+
     public void beforeExecution(CircuitBreaker cb) {
         return;
     }
@@ -20,10 +20,13 @@ public class ClosedState implements StateInterface {
     }
 
     public void onFailure(CircuitBreaker cb) {
-        cb.consecutiveFailures+=1;
-        if(cb.consecutiveFailures >= cb.config.failureThreshold) {
+        cb.updateFailureQueue();
+        Instant windowStart = Instant.now().minus(cb.config.slidingWindowDuration);
+        if (cb.failureTimestamps.size() >= cb.config.failureThreshold
+                && cb.failureTimestamps.getFirst().isAfter(windowStart)) {
             cb.openedAt = Instant.now();
-            cb.stateManagement = new OpenState();
+            cb.stateManagement = cb.OPEN_STATE;
+            cb.failureTimestamps.clear();
         }
     }
 }

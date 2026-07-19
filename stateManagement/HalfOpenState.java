@@ -11,9 +11,9 @@ public class HalfOpenState implements StateInterface {
     public State name() {
         return State.HALF_OPEN;
     }
-    
+
     public void beforeExecution(CircuitBreaker cb) {
-        if(cb.probeRunning) {
+        if (cb.probeRunning) {
             throw new CircuitBreakerOpenException();
         }
         System.out.println("Sending 1 request to Client. State:HALF_OPEN");
@@ -22,16 +22,18 @@ public class HalfOpenState implements StateInterface {
 
     public void onSuccess(CircuitBreaker cb) {
         System.out.println("Request Successful. State:Closed");
-        cb.consecutiveFailures = 0;
+        // cb.consecutiveFailures = 0;
         cb.openedAt = Instant.now();
-        cb.stateManagement = new ClosedState();
+        cb.stateManagement = cb.CLOSED_STATE;
         cb.probeRunning = false;
+        cb.failureTimestamps.clear();
     }
 
     public void onFailure(CircuitBreaker cb) {
         System.out.println("Request Failed. State:OPEN");
         cb.openedAt = Instant.now();
-        cb.stateManagement = new OpenState();
+        cb.stateManagement = cb.OPEN_STATE;
         cb.probeRunning = false;
+        cb.failureTimestamps.clear();
     }
 }
